@@ -1,0 +1,3 @@
+(executable
+  (name exercises3test)
+  (libraries ounit2 stdlib))
