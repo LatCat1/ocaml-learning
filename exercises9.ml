@@ -419,6 +419,34 @@ type 'a altseq = AltCons of (unit -> 'a * 'a altseq)
 let althd (AltCons next) = fst @@ next ()
 let alttl (AltCons next) = snd @@ next ()
 
-let nats = 
-  let rec helper i () : 'a * 'a altseq = (i, helper (i+1)) in
+let alt_nats = 
+  let rec helper i () : 'a * 'a altseq = (i, AltCons (helper (i+1))) in
   helper 0
+
+let rec altmap f (AltCons c) () =
+  let (x, c') = c () in
+  (f x, AltCons (altmap f c'))
+
+(*
+This is lazier than the original implementation because it doesn't calculate
+anything at all until it is required   
+*)
+
+(* lazy hello *)
+let lazy_hello : unit Lazy.t =
+  lazy (print_string "Hello lazy world")
+
+(* lazy and *)
+let lazy_and x y =
+  if Lazy.force x then Lazy.force y else false
+
+(* lazy sequence *)
+
+type 'a lazysequence = LazyCons of 'a * 'a lazysequence lazy_t
+
+let rec lazy_map (f : 'a -> 'b) (LazyCons (x, lazy_xs) : 'a lazysequence) : 'b lazysequence =
+  LazyCons (f x, Lazy.map (lazy_map f) lazy_xs)
+
+let rec lazy_filter (p : 'a -> bool) (LazyCons (x, lazy_xs) : 'a lazysequence) : 'a lazysequence =
+  let remainder = Lazy.map (lazy_filter p) lazy_xs in
+  if p x then LazyCons (x, remainder) else Lazy.force remainder
