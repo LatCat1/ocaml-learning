@@ -1,3 +1,14 @@
+; (executable
+;   (name exercises3test)
+;   (libraries ounit2 stdlib))
+; (executable
+;   (name exercises4test)
+;   (libraries ounit2 stdlib))
 (executable
-  (name exercises3test)
-  (libraries ounit2 stdlib))
+  (name date))
+(executable
+  (name exercises7)
+  (libraries stdlib lwt.unix))
+(executable
+  (name monitor)
+  (libraries lwt.unix))
